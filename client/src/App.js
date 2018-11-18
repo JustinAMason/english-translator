@@ -2,43 +2,74 @@ import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
-  state = {
-    post: '',
-    responseToPost: '',
-  };
 
-  componentDidMount() {
-    this.callApi()
-      .then(res => this.setState({ response: res.express }))
-      .catch(err => console.log(err));
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      input: '',
+      language: '',
+      translation: '',
+      languageDisplay: 'none'
+    };
+
+    this.translate = this.translate.bind(this);
+    this.updateInput = this.updateInput.bind(this);
   }
 
-  callApi = async () => {
-    const response = await fetch('/api/hello');
-    const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
-    return body;
-  };
-
-  handleSubmit = async e => {
-    e.preventDefault();
-    const response = await fetch('/api/world', {
+  getLanguage = async e => {
+    const response = await fetch('/detectLanguage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ post: this.state.post }),
+      body: JSON.stringify({ input: this.state.input }),
     });
-    const body = await response.text();
-    this.setState({ responseToPost: body });
+
+    const languageDetected = await response.text();
+
+    this.setState({
+      language: languageDetected,
+      languageDisplay: 'block'
+    });
+  }
+
+  getTranslation = async e => {
+    const response = await fetch('/translate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ input: this.state.input }),
+    });
+
+    const translation = await response.text();
+
+    this.setState({
+      translation: translation,
+    });
+  }
+
+  translate(event) {
+    this.getLanguage();
+    this.getTranslation();
   };
+
+  updateInput(event) {
+    this.setState({
+      input: event.target.value,
+      translation: '',
+      languageDisplay: "none"
+    });
+  }
 
   render() {
     return (
       <div>
-        <textarea id="input_box" name="input_box" rows="10" cols="90" placeholder="Input Text"></textarea>
-        <input type="submit" value="Translate to English"/>
-        <textarea id="output_box" name="output_box" rows="10" cols="90" placeholder="Translation"></textarea>
+        <textarea id="input_box" name="input_box" rows="10" cols="90" placeholder="Input Text" onChange={this.updateInput}></textarea>
+        <input type="submit" value="Translate to English" onClick={this.translate}/>
+        <textarea id="output_box" name="output_box" rows="10" cols="90" placeholder="Translation">{this.state.translation}</textarea>
+        <p style={{display:this.state.languageDisplay}}>(translated from {this.state.language})</p>
       </div>
     );
   }
