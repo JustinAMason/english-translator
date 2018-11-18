@@ -26,12 +26,7 @@ class App extends Component {
       body: JSON.stringify({ input: this.state.input }),
     });
 
-    const languageDetected = await response.text();
-
-    this.setState({
-      language: languageDetected,
-      languageDisplay: 'block'
-    });
+    return(await response.text());
   }
 
   getTranslation = async e => {
@@ -43,17 +38,18 @@ class App extends Component {
       body: JSON.stringify({ input: this.state.input }),
     });
 
-    const translation = await response.text();
-
-    this.setState({
-      translation: translation,
-    });
+    return(await response.text());
   }
 
-  translate(event) {
-    this.getLanguage();
-    this.getTranslation();
-  };
+  translate = async e => {
+    const language = await this.getLanguage();
+    const translation = await this.getTranslation();
+    this.setState({
+      language: language,
+      languageDisplay: 'block',
+      translation: translation
+    })
+  }
 
   updateInput(event) {
     this.setState({
