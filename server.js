@@ -6,6 +6,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const {Translate} = require('@google-cloud/translate');
+const ISO6391 = require('iso-639-1');
 
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   // To obtain credentials, go to https://cloud.google.com/translate/docs/quickstart
@@ -19,7 +20,7 @@ app.post('/detectLanguage', (req, res) => {
   const input = req.body.input;
 
   translate.detect(input).then(languages => {
-    res.send(languages[0].language);
+    res.send(ISO6391.getName(languages[0].language));
   }).catch(err => {
     res.send("ERROR!");
   });

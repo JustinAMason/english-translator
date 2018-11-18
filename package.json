@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@google-cloud/translate": "^2.1.2",
+    "iso-639-1": "^2.0.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4"
   },
